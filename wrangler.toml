@@ -1,4 +1,4 @@
-name            = "oxipulse-install"
+name = "oxi-pulse-install"
 main            = "src/index.js"
 compatibility_date = "2025-01-01"
 
