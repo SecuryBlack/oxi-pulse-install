@@ -2,6 +2,6 @@ name            = "oxipulse-install"
 main            = "src/index.js"
 compatibility_date = "2025-01-01"
 
-routes = [
-  { pattern = "install.oxipulse.dev/*", zone_name = "oxipulse.dev" },
-]
+[[routes]]
+pattern = "install.oxipulse.dev/*"
+zone_name = "oxipulse.dev"
