@@ -17,14 +17,6 @@ export default {
       ? `${REPO_RAW}/install.ps1`
       : `${REPO_RAW}/install.sh`;
 
-    const response = await fetch(scriptUrl);
-
-    return new Response(response.body, {
-      status: response.status,
-      headers: {
-        "Content-Type": isWindows ? "text/plain; charset=utf-8" : "text/x-sh; charset=utf-8",
-        "Cache-Control": "no-store",
-      },
-    });
+    return Response.redirect(scriptUrl, 302);
   },
 };
