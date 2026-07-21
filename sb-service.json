@@ -1,0 +1,8 @@
+{
+  "name": "OxiPulse Installer",
+  "description": "Cloudflare Worker para el script de instalación de OxiPulse",
+  "type": "wrangler",
+  "role": "installer",
+  "port": 8787,
+  "start": "npx wrangler dev --port 8787"
+}
