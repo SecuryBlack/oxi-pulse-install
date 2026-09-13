@@ -34,7 +34,14 @@ export default {
         });
       }
 
-      const scriptText = await res.text();
+      let scriptText = await res.text();
+
+      if (isWindows) {
+        const winHeader = `# SecuryBlack Windows Compatibility (Windows Server 2019+ / PowerShell 5.1)\r\n[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls\r\nSet-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force -ErrorAction SilentlyContinue\r\n\r\n`;
+        if (!scriptText.includes("[Net.ServicePointManager]::SecurityProtocol")) {
+          scriptText = winHeader + scriptText;
+        }
+      }
 
       return new Response(scriptText, {
         status: 200,
