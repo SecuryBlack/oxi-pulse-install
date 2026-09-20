@@ -6,7 +6,10 @@
  *   irm  https://install.oxipulse.dev | iex                 → install.ps1 (Windows)
  */
 
-const REPO_RAW = "https://raw.githubusercontent.com/securyblack/oxi-pulse/main/scripts";
+const REPOS = [
+  "https://raw.githubusercontent.com/securyblack/oxi-pulse/main/scripts",
+  "https://raw.githubusercontent.com/securyblack/oxi-pulse/master/scripts",
+];
 
 export default {
   async fetch(req) {
@@ -20,15 +23,22 @@ export default {
                         url.pathname.endsWith(".ps1");
 
       const scriptFile = isWindows ? "install.ps1" : "install.sh";
-      const githubUrl = `${REPO_RAW}/${scriptFile}`;
+      
+      let res = null;
+      for (const repoUrl of REPOS) {
+        const githubUrl = `${repoUrl}/${scriptFile}`;
+        const attempt = await fetch(githubUrl, {
+          headers: { "User-Agent": "SecuryBlack-Installer-Worker" },
+          cf: { cacheTtl: 60 },
+        });
+        if (attempt.ok) {
+          res = attempt;
+          break;
+        }
+      }
 
-      const res = await fetch(githubUrl, {
-        headers: { "User-Agent": "SecuryBlack-Installer-Worker" },
-        cf: { cacheTtl: 60 }
-      });
-
-      if (!res.ok) {
-        return new Response(`# Error: Failed to fetch installer script from GitHub (HTTP ${res.status})\n`, {
+      if (!res) {
+        return new Response(`# Error: Failed to fetch installer script from GitHub\n`, {
           status: 502,
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         });
@@ -59,4 +69,3 @@ export default {
     }
   },
 };
-
