@@ -5,3 +5,7 @@ compatibility_date = "2025-01-01"
 [[routes]]
 pattern = "install.oxipulse.dev/*"
 zone_name = "oxipulse.dev"
+
+[[analytics_engine_datasets]]
+binding = "INSTALLS"
+dataset = "oxipulse_installs"

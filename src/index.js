@@ -11,8 +11,28 @@ const REPOS = [
   "https://raw.githubusercontent.com/securyblack/oxi-pulse/master/scripts",
 ];
 
+// Install counter: one data point per script served, without IP or identifiers.
+// Browsers are people reading the script; curl/wget/PowerShell are installs.
+function countInstall(env, req, scriptFile) {
+  try {
+    const ua = req.headers.get("User-Agent") ?? "";
+    const client = /PowerShell/i.test(ua) ? "powershell"
+      : /^curl\//i.test(ua) ? "curl"
+      : /^Wget\//i.test(ua) ? "wget"
+      : /Mozilla/i.test(ua) ? "browser"
+      : "other";
+    env.INSTALLS?.writeDataPoint({
+      indexes: [scriptFile],
+      blobs: [scriptFile, client, req.cf?.country ?? ""],
+      doubles: [1],
+    });
+  } catch {
+    // Counting must never break the installer.
+  }
+}
+
 export default {
-  async fetch(req) {
+  async fetch(req, env) {
     try {
       const url = new URL(req.url);
       const ua = req.headers.get("User-Agent") ?? "";
@@ -45,6 +65,7 @@ export default {
       }
 
       let scriptText = await res.text();
+      countInstall(env, req, scriptFile);
 
       if (isWindows) {
         const winHeader = `# SecuryBlack Windows Compatibility (Windows Server 2019+ / PowerShell 5.1)\r\n[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls\r\nSet-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force -ErrorAction SilentlyContinue\r\n\r\n`;
