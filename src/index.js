@@ -67,12 +67,8 @@ export default {
       let scriptText = await res.text();
       countInstall(env, req, scriptFile);
 
-      if (isWindows) {
-        const winHeader = `# SecuryBlack Windows Compatibility (Windows Server 2019+ / PowerShell 5.1)\r\n[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls\r\nSet-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force -ErrorAction SilentlyContinue\r\n\r\n`;
-        if (!scriptText.includes("[Net.ServicePointManager]::SecurityProtocol")) {
-          scriptText = winHeader + scriptText;
-        }
-      }
+      // Served verbatim: anything prepended would push `param(...)` off the first
+      // statement and break `[scriptblock]::Create(...)`. Each install.ps1 sets TLS itself.
 
       return new Response(scriptText, {
         status: 200,
